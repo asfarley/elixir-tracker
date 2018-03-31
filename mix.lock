@@ -1,0 +1,3 @@
+%{
+  "json": {:hex, :json, "1.0.3", "547d58dbbd864c0a560c0ca3789ee8848974e8c517cdb7827c3303e3b42e754d", [:mix], [], "hexpm"},
+}
