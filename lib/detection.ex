@@ -96,4 +96,10 @@ defmodule Detection do
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_color]).(color_distance)
   end
 
+  def in_frame(detections,frame) do
+    Enum.filter(detections, fn d ->
+      d["frame"] == frame
+    end)
+  end
+
 end

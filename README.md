@@ -1,7 +1,6 @@
 # Tracker
 
 ## TODO:
- * Implement P_link (association probability)
  * Implement global cost calculation
  * Implement basic iterative algorithm (no occlusion model)
 

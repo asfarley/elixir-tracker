@@ -15,4 +15,13 @@ defmodule Tracker do
   def hello do
     :world
   end
+
+  def samplepath do
+    "./data/Detections.json"
+  end
+
+  def sample_detections do
+    Detection.fromfile(samplepath())
+  end
+
 end

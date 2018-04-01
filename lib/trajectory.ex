@@ -40,8 +40,8 @@ defmodule Trajectory do
   end
 
   #Cost of linking x_i to x_j
-  def c_i_j(p_link, x_i, x_j) do
-    -:math.log(p_link.(x_i,x_j))
+  def c_i_j(p_link) do
+    -:math.log(p_link)
   end
 
   #Cost of detection x_i
