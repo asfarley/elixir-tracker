@@ -1,8 +1,20 @@
 defmodule Detection do
   @moduledoc """
-  A Detection represents a single observation of a single
+  A Detection represents one observation of one
   object from one frame of video data.
   """
+
+  defstruct X: 0,
+            Y: 0,
+            Width: 0,
+            Height: 0,
+            Size: 0,
+            Red: 0,
+            Green: 0,
+            Blue: 0,
+            ObjectClass: 0,
+            frame: 0,
+            id: 0
 
   @doc """
   Read detections from JSON log file.
@@ -35,14 +47,14 @@ defmodule Detection do
         {:error, _} -> []
       end
 
-    Enum.map(detections, fn d -> Map.merge(d, %{"frame" => line_number}) end)
+    Enum.map(detections, fn d -> Map.merge(d, %{:frame => line_number}) end)
   end
 
   def add_unique_numbering(detections) do
     detection_number_tuples = Enum.zip(detections, 1..length(detections))
 
     Enum.map(detection_number_tuples, fn dnt ->
-      Map.merge(elem(dnt, 0), %{"id" => elem(dnt, 1)})
+      Map.merge(elem(dnt, 0), %{:id => elem(dnt, 1)})
     end)
   end
 
@@ -55,21 +67,23 @@ defmodule Detection do
     psd * ppd * ptd * pcd
   end
 
-  @spec p_size_delta(map, map, map) :: number
+  @spec p_size_delta(Detection, Detection, map) :: number
   def p_size_delta(x_i, x_j, constants) do
-    size_delta = x_i["Size"] - x_j["Size"]
+    size_delta = x_i."Size" - x_j."Size"
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_size]).(size_delta)
   end
 
+  @spec p_position_delta(map, map, map) :: number
   def p_position_delta(x_i, x_j, constants) do
-    x_delta = x_i["X"] - x_j["X"]
-    y_delta = x_i["Y"] - x_j["Y"]
+    x_delta = x_i."X" - x_j."X"
+    y_delta = x_i."Y" - x_j."Y"
     straight_line_distance = :math.sqrt(:math.pow(x_delta, 2) + :math.pow(y_delta, 2))
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_position]).(straight_line_distance)
   end
 
+  @spec p_time_delta(map, map, map) :: number
   def p_time_delta(x_i, x_j, constants) do
-    time_delta = x_j["frame"] - x_i["frame"]
+    time_delta = x_j.frame - x_i.frame
 
     cond do
       time_delta < 1 -> 0.0
@@ -78,10 +92,11 @@ defmodule Detection do
     end
   end
 
+  @spec p_color_delta(map, map, map) :: number
   def p_color_delta(x_i, x_j, constants) do
-    red_delta = x_i["Red"] - x_j["Red"]
-    green_delta = x_i["Green"] - x_j["Green"]
-    blue_delta = x_i["Blue"] - x_j["Blue"]
+    red_delta = x_i."Red" - x_j."Red"
+    green_delta = x_i."Green" - x_j."Green"
+    blue_delta = x_i."Blue" - x_j."Blue"
 
     color_distance =
       :math.sqrt(:math.pow(red_delta, 2) + :math.pow(green_delta, 2) + :math.pow(blue_delta, 2))
@@ -91,35 +106,7 @@ defmodule Detection do
 
   def in_frame(detections, frame) do
     Enum.filter(detections, fn d ->
-      d["frame"] == frame
+      d.frame == frame
     end)
-  end
-
-  def new(
-        x \\ 0,
-        y \\ 0,
-        red \\ 0,
-        green \\ 0,
-        blue \\ 0,
-        height \\ 0,
-        width \\ 0,
-        size \\ 0,
-        objectclass \\ 0,
-        frame \\ 0,
-        id \\ 0
-      ) do
-    %{
-      "X" => x,
-      "Y" => y,
-      "Red" => red,
-      "Green" => green,
-      "Blue" => blue,
-      "Height" => height,
-      "Width" => width,
-      "Size" => size,
-      "ObjectClass" => objectclass,
-      "frame" => frame,
-      "id" => id
-    }
   end
 end
