@@ -23,5 +23,4 @@ defmodule Tracker do
   def sample_detections do
     Detection.fromfile(samplepath())
   end
-
 end

@@ -1,6 +1,9 @@
 # Tracker
 
 ## TODO:
+ * Write tests
+ * Refactoring
+ * Define structs: detections, arcs, algorithm_state, trajectory
  * Implement global cost calculation
  * Implement basic iterative algorithm (no occlusion model)
 
