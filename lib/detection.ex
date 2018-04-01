@@ -46,6 +46,7 @@ defmodule Detection do
     end)
   end
 
+  @spec p_link(map, map, map) :: number
   def p_link(x_i, x_j, constants) do
     psd = p_size_delta(x_i, x_j, constants)
     ppd = p_position_delta(x_i, x_j, constants)
@@ -54,6 +55,7 @@ defmodule Detection do
     psd * ppd * ptd * pcd
   end
 
+  @spec p_size_delta(map, map, map) :: number
   def p_size_delta(x_i, x_j, constants) do
     size_delta = x_i["Size"] - x_j["Size"]
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_size]).(size_delta)

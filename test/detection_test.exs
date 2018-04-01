@@ -8,9 +8,9 @@ defmodule DetectionTest do
 
   test "p_size_delta is inversely related to size-delta" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "Size" => 100}
-    x_j = %{Detection.new() | "Size" => 110}
-    x_k = %{Detection.new() | "Size" => 100_000}
+    x_i = %{Detection.new() | "Size" => 200}
+    x_j = %{Detection.new() | "Size" => 210}
+    x_k = %{Detection.new() | "Size" => 10_000}
     p_size_ij = Detection.p_size_delta(x_i, x_j, constants)
     p_size_jk = Detection.p_size_delta(x_j, x_k, constants)
     IO.puts("p_size_ij: #{fmt(p_size_ij)}, p_size_jk: #{fmt(p_size_jk)}")
@@ -21,7 +21,7 @@ defmodule DetectionTest do
     constants = Configuration.constants()
     x_i = %{Detection.new() | "X" => 100}
     x_j = %{Detection.new() | "X" => 110}
-    x_k = %{Detection.new() | "X" => 100_000}
+    x_k = %{Detection.new() | "X" => 300}
     p_position_ij = Detection.p_position_delta(x_i, x_j, constants)
     p_position_jk = Detection.p_position_delta(x_j, x_k, constants)
     IO.puts("p_position_ij: #{fmt(p_position_ij)}, p_position_jk: #{fmt(p_position_jk)}")
@@ -42,10 +42,9 @@ defmodule DetectionTest do
   test "p_time_delta is inversely related to time-delta when time-delta is greater
   than 0 and not greater than the maximum time-gap" do
     constants = Configuration.constants()
-    max_delta = constants[:epsilon]
     x_i = %{Detection.new() | "frame" => 100}
     x_j = %{Detection.new() | "frame" => 101}
-    x_k = %{Detection.new() | "frame" => 101 + max_delta}
+    x_k = %{Detection.new() | "frame" => 101 + constants[:epsilon]}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
     IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
@@ -62,5 +61,38 @@ defmodule DetectionTest do
     IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_ij == 0
     assert p_time_jk == 0
+  end
+
+  test "p_time_delta is zero when maximum time-delta is exceeded" do
+    constants = Configuration.constants()
+    x_i = %{Detection.new() | "frame" => 100}
+    x_j = %{Detection.new() | "frame" => 101}
+    x_k = %{Detection.new() | "frame" => 101 + constants[:epsilon] + 1}
+    p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
+    p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
+    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
+    assert p_time_ij != 0
+    assert p_time_jk == 0
+  end
+
+  test "p_link decreases when measurements are dissimiliar" do
+    constants = Configuration.constants()
+    x_i = %{Detection.new() | "X" => 100, "Y" => 200, "Size" => 100, "frame" => 100, "Red" => 100}
+    x_j = %{Detection.new() | "X" => 101, "Y" => 201, "Size" => 110, "frame" => 101, "Red" => 110}
+
+    x_k = %{
+      Detection.new()
+      | "X" => 110,
+        "Y" => 250,
+        "Size" => 1000,
+        "frame" => 1000,
+        "Red" => 200
+    }
+
+    p_link_ij = Detection.p_link(x_i, x_j, constants)
+    p_link_jk = Detection.p_link(x_j, x_k, constants)
+    IO.puts("p_link_ij: #{fmt(p_link_ij)}, p_link_jk: #{fmt(p_link_jk)}")
+    assert p_link_ij != 0
+    assert p_link_jk < p_link_ij
   end
 end
