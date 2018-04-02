@@ -16,9 +16,24 @@ defmodule Detection do
             frame: 0,
             id: 0
 
+  @type detection :: %Detection{
+          X: number,
+          Y: number,
+          Width: number,
+          Height: number,
+          Size: number,
+          Red: number,
+          Green: number,
+          Blue: number,
+          ObjectClass: integer,
+          frame: integer,
+          id: integer
+        }
+
   @doc """
   Read detections from JSON log file.
   """
+  @spec fromfile(String.t()) :: list(Detection.detection())
   def fromfile(detectionsFilepath) do
     {:ok, text} = File.read(detectionsFilepath)
     lines = String.split(text, "\n")
@@ -27,6 +42,8 @@ defmodule Detection do
     lines_to_detections(numbered_lines, [])
   end
 
+  @spec lines_to_detections(list(String.t()), list(Detection.detection())) ::
+          list(Detection.detection())
   def lines_to_detections([head | tail], detections) do
     measurements = numbered_line_to_detections(head)
     lines_to_detections(tail, detections ++ measurements)
@@ -36,6 +53,7 @@ defmodule Detection do
     add_unique_numbering(detections)
   end
 
+  @spec numbered_line_to_detections({String.t(), integer}) :: list(Detection.detection())
   def numbered_line_to_detections(line_with_number) do
     line = elem(line_with_number, 0)
     line_number = elem(line_with_number, 1)
@@ -58,7 +76,7 @@ defmodule Detection do
     end)
   end
 
-  @spec p_link(map, map, map) :: number
+  @spec p_link(Detection.detection(), Detection.detection(), map) :: number
   def p_link(x_i, x_j, constants) do
     psd = p_size_delta(x_i, x_j, constants)
     ppd = p_position_delta(x_i, x_j, constants)
@@ -67,13 +85,13 @@ defmodule Detection do
     psd * ppd * ptd * pcd
   end
 
-  @spec p_size_delta(Detection, Detection, map) :: number
+  @spec p_size_delta(Detection.detection(), Detection.detection(), map) :: number
   def p_size_delta(x_i, x_j, constants) do
     size_delta = x_i."Size" - x_j."Size"
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_size]).(size_delta)
   end
 
-  @spec p_position_delta(map, map, map) :: number
+  @spec p_position_delta(Detection.detection(), Detection.detection(), map) :: number
   def p_position_delta(x_i, x_j, constants) do
     x_delta = x_i."X" - x_j."X"
     y_delta = x_i."Y" - x_j."Y"
@@ -81,7 +99,7 @@ defmodule Detection do
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_position]).(straight_line_distance)
   end
 
-  @spec p_time_delta(map, map, map) :: number
+  @spec p_time_delta(Detection.detection(), Detection.detection(), map) :: number
   def p_time_delta(x_i, x_j, constants) do
     time_delta = x_j.frame - x_i.frame
 
@@ -92,7 +110,7 @@ defmodule Detection do
     end
   end
 
-  @spec p_color_delta(map, map, map) :: number
+  @spec p_color_delta(Detection.detection(), Detection.detection(), map) :: number
   def p_color_delta(x_i, x_j, constants) do
     red_delta = x_i."Red" - x_j."Red"
     green_delta = x_i."Green" - x_j."Green"
@@ -104,6 +122,7 @@ defmodule Detection do
     Statistics.Distributions.Normal.pdf(0, constants[:sigma_color]).(color_distance)
   end
 
+  @spec in_frame([Detection.detection()], integer) :: [Detection.detection()]
   def in_frame(detections, frame) do
     Enum.filter(detections, fn d ->
       d.frame == frame
