@@ -17,17 +17,17 @@ defmodule Detection do
             id: 0
 
   @type detection :: %Detection{
-          X: number,
-          Y: number,
-          Width: number,
-          Height: number,
-          Size: number,
-          Red: number,
-          Green: number,
-          Blue: number,
-          ObjectClass: integer,
-          frame: integer,
-          id: integer
+          X: number(),
+          Y: number(),
+          Width: number(),
+          Height: number(),
+          Size: number(),
+          Red: number(),
+          Green: number(),
+          Blue: number(),
+          ObjectClass: integer(),
+          frame: integer(),
+          id: integer()
         }
 
   @doc """
@@ -68,11 +68,12 @@ defmodule Detection do
     Enum.map(detections, fn d -> Map.merge(d, %{:frame => line_number}) end)
   end
 
+  @spec add_unique_numbering(list(Detection.detection())) :: list(Detection.detection())
   def add_unique_numbering(detections) do
     detection_number_tuples = Enum.zip(detections, 1..length(detections))
 
-    Enum.map(detection_number_tuples, fn dnt ->
-      Map.merge(elem(dnt, 0), %{:id => elem(dnt, 1)})
+    Enum.map(detection_number_tuples, fn d ->
+      %{elem(d, 0) | id: elem(d, 1)}
     end)
   end
 
