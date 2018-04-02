@@ -3,14 +3,6 @@ defmodule Arc do
 
   @type arc :: %Arc{}
 
-  @spec detection_to_subgraph(Detection.detection(), AlgorithmState.algorithmstate()) ::
-          Graph.graph()
-  def detection_to_subgraph(x_i, algorithm_state) do
-    nodes = detection_to_nodes(x_i)
-    arcs = detection_to_arcs(x_i, algorithm_state, nodes)
-    %Graph{nodes: nodes, arcs: arcs}
-  end
-
   @spec detection_to_entry_arc(Detection.detection(), AlgorithmState.algorithmstate(), atom()) ::
           Arc.arc()
   def detection_to_entry_arc(x_i, algorithm_state, u_i) do
@@ -52,13 +44,6 @@ defmodule Arc do
       flow = Trajectory.f_i_j(algorithm_state[:T], x_i, d)
       {v_i, destination_node, cost, flow}
     end)
-  end
-
-  @spec detection_to_nodes(Detection.detection()) :: list(atom())
-  def detection_to_nodes(x_i) do
-    u_i = String.to_atom("u_#{x_i.id}")
-    v_i = String.to_atom("v_#{x_i.id}")
-    [u_i, v_i]
   end
 
   @spec detection_to_arcs(Detection.detection(), AlgorithmState.algorithmstate(), list()) ::
