@@ -13,7 +13,6 @@ defmodule DetectionTest do
     x_k = %Detection{Size: 10_000}
     p_size_ij = Detection.p_size_delta(x_i, x_j, constants)
     p_size_jk = Detection.p_size_delta(x_j, x_k, constants)
-    IO.puts("p_size_ij: #{fmt(p_size_ij)}, p_size_jk: #{fmt(p_size_jk)}")
     assert p_size_jk < p_size_ij
   end
 
@@ -24,7 +23,6 @@ defmodule DetectionTest do
     x_k = %Detection{X: 300}
     p_position_ij = Detection.p_position_delta(x_i, x_j, constants)
     p_position_jk = Detection.p_position_delta(x_j, x_k, constants)
-    IO.puts("p_position_ij: #{fmt(p_position_ij)}, p_position_jk: #{fmt(p_position_jk)}")
     assert p_position_jk < p_position_ij
   end
 
@@ -35,7 +33,6 @@ defmodule DetectionTest do
     x_k = %Detection{Red: 30}
     p_color_ij = Detection.p_color_delta(x_i, x_j, constants)
     p_color_jk = Detection.p_color_delta(x_j, x_k, constants)
-    IO.puts("p_color_ij: #{fmt(p_color_ij)}, p_color_jk: #{fmt(p_color_jk)}")
     assert p_color_jk < p_color_ij
   end
 
@@ -47,7 +44,6 @@ defmodule DetectionTest do
     x_k = %Detection{frame: 101 + constants[:epsilon]}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
-    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_jk < p_time_ij
   end
 
@@ -58,7 +54,6 @@ defmodule DetectionTest do
     x_k = %Detection{frame: 50}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
-    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_ij == 0
     assert p_time_jk == 0
   end
@@ -70,7 +65,6 @@ defmodule DetectionTest do
     x_k = %Detection{frame: 101 + constants[:epsilon] + 1}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
-    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_ij != 0
     assert p_time_jk == 0
   end
@@ -80,7 +74,6 @@ defmodule DetectionTest do
     x_i = %Detection{X: 100, Y: 200, Size: 100, frame: 100, Red: 100}
     x_j = %Detection{X: 101, Y: 201, Size: 110, frame: 101, Red: 110}
     x_k = %Detection{X: 110, Y: 250, Size: 1000, frame: 1000, Red: 200}
-
     p_link_ij = Detection.p_link(x_i, x_j, constants)
     p_link_jk = Detection.p_link(x_j, x_k, constants)
     IO.puts("p_link_ij: #{fmt(p_link_ij)}, p_link_jk: #{fmt(p_link_jk)}")
