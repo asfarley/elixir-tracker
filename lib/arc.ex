@@ -32,8 +32,11 @@ defmodule Arc do
     %Arc{in: List.first(nodes), out: List.last(nodes), cost: exit_cost, flow: exit_flow}
   end
 
-  @spec detection_to_entry_arc(Detection.detection(), atom(), AlgorithmState.algorithmstate()) ::
-          list(Arc.arc())
+  @spec detection_to_association_arcs(
+          Detection.detection(),
+          atom(),
+          AlgorithmState.algorithmstate()
+        ) :: list(Arc.arc())
   def detection_to_association_arcs(x_i, v_i, algorithm_state) do
     plinked_detections =
       get_plinked_detections(x_i, algorithm_state[:X], algorithm_state[:constants])
@@ -42,7 +45,7 @@ defmodule Arc do
       destination_node = algorithm_state[:XV][d]
       cost = Trajectory.c_i_j(Detection.p_link(x_i, d, algorithm_state[:constants]))
       flow = Trajectory.f_i_j(algorithm_state[:T], x_i, d)
-      {v_i, destination_node, cost, flow}
+      %Arc{in: v_i, out: destination_node, cost: cost, flow: flow}
     end)
   end
 
