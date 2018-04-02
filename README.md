@@ -1,6 +1,7 @@
 # Tracker
 
 ## TODO:
+ * Write tests for Graph, Arc, AlgorithmState
  * Review algorithm state structure
  * Implement min-cost flow calculation
  * Implement global cost calculation

@@ -1,7 +1,10 @@
 defmodule Graph do
-  defstruct nodes: [], arcs: []
+  defstruct X: [], XV: %{}, VX: %{}, nodes: [], arcs: []
 
   @type graph :: %Graph{
+          X: list(Detection.detection()),
+          XV: map(),
+          VX: map(),
           nodes: list(atom()),
           arcs: list(Arc.arc())
         }
@@ -11,7 +14,8 @@ defmodule Graph do
   def detection_to_subgraph(x_i, algorithm_state) do
     nodes = detection_to_nodes(x_i)
     arcs = Arc.detection_to_arcs(x_i, algorithm_state, nodes)
-    %Graph{nodes: nodes, arcs: arcs}
+    # TODO: Build XV and VX
+    %Graph{X: [x_i], nodes: nodes, arcs: arcs}
   end
 
   @spec detection_to_nodes(Detection.detection()) :: list(atom())

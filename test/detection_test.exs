@@ -76,7 +76,6 @@ defmodule DetectionTest do
     x_k = %Detection{X: 110, Y: 250, Size: 1000, frame: 1000, Red: 200}
     p_link_ij = Detection.p_link(x_i, x_j, constants)
     p_link_jk = Detection.p_link(x_j, x_k, constants)
-    IO.puts("p_link_ij: #{fmt(p_link_ij)}, p_link_jk: #{fmt(p_link_jk)}")
     assert p_link_ij != 0
     assert p_link_jk < p_link_ij
   end
