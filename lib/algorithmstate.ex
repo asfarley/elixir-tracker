@@ -1,18 +1,20 @@
 defmodule AlgorithmState do
   defstruct X: [],
             XV: %{},
-            Network: %Graph{},
+            VX: %{},
+            G: %Graph{},
             f_G: 0,
             T: [],
             T_star: [],
             C_star: 0.0,
-            f_star: 0,
+            f_star: 0.0,
             constants: Configuration.constants()
 
   @type algorithmstate :: %AlgorithmState{
           X: list(Detection.detection()),
           XV: map(),
-          Network: Graph.graph(),
+          VX: map(),
+          G: Graph.graph(),
           f_G: number(),
           T: list(Trajectory.trajectory()),
           T_star: list(Trajectory.trajectory()),
@@ -29,5 +31,13 @@ defmodule AlgorithmState do
   @spec p_exit(map) :: float
   def p_exit(algorithm_state) do
     p_entr(algorithm_state)
+  end
+
+  @spec fromfile(String.t()) :: AlgorithmState.algorithmstate()
+  def fromfile(filepath) do
+    detections = Detection.fromfile(filepath)
+    # TODO: make nodes and detection->node mapping
+    # TODO: make arcs
+    %AlgorithmState{X: detections}
   end
 end
