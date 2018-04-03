@@ -47,21 +47,30 @@ defmodule Trajectory do
   end
 
   # Entrance cost
-  @spec c_en_i(number) :: number
+  @spec c_en_i(number) :: number | :positive_infinity
   def c_en_i(p_entr) do
-    -:math.log(p_entr)
+    cond do
+      p_entr == 0.0 -> :positive_infinity
+      p_entr > 0.0 -> -:math.log(p_entr)
+    end
   end
 
   # Exit cost
-  @spec c_ex_i(number) :: number
+  @spec c_ex_i(number) :: number | :positive_infinity
   def c_ex_i(p_exit) do
-    -:math.log(p_exit)
+    cond do
+      p_exit == 0.0 -> :positive_infinity
+      p_exit > 0.0 -> -:math.log(p_exit)
+    end
   end
 
   # Cost of linking x_i to x_j
-  @spec c_i_j(number) :: number
+  @spec c_i_j(number) :: number | :positive_infinity
   def c_i_j(p_link) do
-    -:math.log(p_link)
+    cond do
+      p_link == 0.0 -> :positive_infinity
+      p_link > 0.0 -> -:math.log(p_link)
+    end
   end
 
   # Cost of detection x_i

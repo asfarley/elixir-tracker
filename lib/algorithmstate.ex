@@ -19,7 +19,7 @@ defmodule AlgorithmState do
 
   @spec p_entr(map) :: float
   def p_entr(algorithm_state) do
-    length(algorithm_state[:T]) / ((length(algorithm_state[:V]) - 2) / 2)
+    length(algorithm_state."T") / ((length(algorithm_state."G".nodes) - 2) / 2)
   end
 
   @spec p_exit(map) :: float
