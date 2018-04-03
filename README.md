@@ -4,7 +4,7 @@ An implementation of the global data-association algorithm described here:
 [Global Data Association for Multi-Object Tracking Using Network Flows (Zhang, Li, Nevatia 2008)](http://vision.cse.psu.edu/courses/Tracking/vlpr12/lzhang_cvpr08global.pdf)
 
 ## TODO:
- * Write tests for Graph, Arc, AlgorithmState
+ * Write tests for Graph, AlgorithmState
  * Implement global cost calculation
  * Implement min-cost flow calculation
  * Implement basic iterative algorithm (no occlusion model)

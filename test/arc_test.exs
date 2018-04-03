@@ -36,7 +36,6 @@ defmodule ArcTest do
   test "detection_to_association_arcs generates association arcs" do
     d = %Detection{}
     as = %AlgorithmState{}
-    nodes = [:u_1, :v_1]
     arcs = Arc.detection_to_association_arcs(d, :v_1, as)
     assert length(arcs) == 0
   end
@@ -58,7 +57,6 @@ defmodule ArcTest do
     detections = [d0, d1, d2, d3, d4]
     g = %Graph{X: detections}
     as = %AlgorithmState{G: g}
-    nodes = [:u_1, :v_1]
     plinked_detections = Arc.get_plinked_detections(d1, detections, as.constants)
     assert length(plinked_detections) == 3
   end

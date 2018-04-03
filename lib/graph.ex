@@ -14,8 +14,11 @@ defmodule Graph do
   def detection_to_subgraph(x_i, algorithm_state) do
     nodes = detection_to_nodes(x_i)
     arcs = Arc.detection_to_arcs(x_i, algorithm_state, nodes)
-    # TODO: Build XV and VX
-    %Graph{X: [x_i], nodes: nodes, arcs: arcs}
+    xv = %{x_i => nodes}
+    u_i = List.first(nodes)
+    v_i = List.last(nodes)
+    vx = %{u_i => x_i, v_i => x_i}
+    %Graph{X: [x_i], XV: xv, VX: vx, nodes: nodes, arcs: arcs}
   end
 
   @spec detection_to_nodes(Detection.detection()) :: list(atom())
