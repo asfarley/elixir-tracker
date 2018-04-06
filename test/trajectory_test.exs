@@ -55,4 +55,13 @@ defmodule TrajectoryTest do
     assert Trajectory.f_i(trajectories_2, x_i) == 0
     assert Trajectory.f_i(trajectories_1, x_k) == 1
   end
+
+  test "c_en_i returns expected result" do
+    c_en_i_0 = Trajectory.c_en_i(0)
+    assert c_en_i_0 == :positive_infinity
+    c_en_i_1 = Trajectory.c_en_i(1.0)
+    assert c_en_i_1 == 0.0
+    c_en_i_01 = Trajectory.c_en_i(0.1)
+    assert c_en_i_01 > 0.0
+  end
 end

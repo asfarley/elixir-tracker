@@ -4,8 +4,9 @@ defmodule ArcTest do
 
   test "detection_to_entry_arc generates entry arc" do
     d = %Detection{}
-    as = %AlgorithmState{}
-    arc = Arc.detection_to_entry_arc(d, as, :u_1)
+    trajectories = []
+    detections = []
+    arc = Arc.detection_to_entry_arc(d, trajectories, detections, :u_1)
     assert arc.in == :source
     assert arc.out == :u_1
     assert arc.cost > 0 or arc.cost == :positive_infinity
@@ -14,8 +15,9 @@ defmodule ArcTest do
 
   test "detection_to_exit_arc generates exit arc" do
     d = %Detection{}
-    as = %AlgorithmState{}
-    arc = Arc.detection_to_exit_arc(d, as, :v_1)
+    trajectories = []
+    detections = []
+    arc = Arc.detection_to_exit_arc(d, trajectories, detections, :v_1)
     assert arc.in == :v_1
     assert arc.out == :sink
     assert arc.cost > 0 or arc.cost == :positive_infinity
@@ -24,9 +26,17 @@ defmodule ArcTest do
 
   test "detection_to_detection_arc generates inter-detection arc" do
     d = %Detection{}
-    as = %AlgorithmState{}
+    trajectories = []
     nodes = [:u_1, :v_1]
-    arc = Arc.detection_to_detection_arc(d, as, nodes)
+
+    arc =
+      Arc.detection_to_detection_arc(
+        d,
+        trajectories,
+        Configuration.constants().beta,
+        nodes
+      )
+
     assert arc.in == :u_1
     assert arc.out == :v_1
     assert arc.cost < 0
@@ -35,16 +45,29 @@ defmodule ArcTest do
 
   test "detection_to_association_arcs generates association arcs" do
     d = %Detection{}
-    as = %AlgorithmState{}
-    arcs = Arc.detection_to_association_arcs(d, :v_1, as)
+    trajectories = []
+    detections = []
+    xv = %{}
+
+    arcs =
+      Arc.detection_to_association_arcs(
+        d,
+        :v_1,
+        trajectories,
+        detections,
+        xv,
+        Configuration.constants()
+      )
+
     assert length(arcs) == 0
   end
 
   test "detection_to_arcs generates all arcs" do
     d = %Detection{}
-    as = %AlgorithmState{}
+    detections = []
+    trajectories = []
     nodes = [:u_1, :v_1]
-    arcs = Arc.detection_to_arcs(d, as, nodes)
+    arcs = Arc.detection_to_arcs(d, trajectories, detections, nodes, Configuration.constants())
     assert length(arcs) == 3
   end
 
@@ -55,9 +78,7 @@ defmodule ArcTest do
     d3 = %Detection{frame: 3}
     d4 = %Detection{frame: 4}
     detections = [d0, d1, d2, d3, d4]
-    g = %Graph{X: detections}
-    as = %AlgorithmState{G: g}
-    plinked_detections = Arc.get_plinked_detections(d1, detections, as.constants)
+    plinked_detections = Arc.get_plinked_detections(d1, detections, Configuration.constants())
     assert length(plinked_detections) == 3
   end
 end
