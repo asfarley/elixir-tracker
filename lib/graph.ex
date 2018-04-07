@@ -1,61 +1,55 @@
 defmodule Graph do
-  def detection_to_subgraph(x_i, algorithm_state) do
-    nodes = detection_to_nodes(x_i)
-    arcs = detection_to_arcs(x_i, algorithm_state, nodes)
-    %{:nodes => nodes, :arcs => arcs}
-  end
+  defstruct X: [], XV: %{}, VX: %{}, nodes: [], arcs: []
 
-  def detection_to_entry_arc(x_i, algorithm_state, u_i) do
-    p_entr = NFAlgorithmState.p_entr(algorithm_state)
-    entry_cost = Trajectory.c_en_i(p_entr)
-    entry_flow = Trajectory.f_en_i(algorithm_state[:T], x_i)
-    {:source, u_i, entry_cost, entry_flow}
-  end
+  @type graph :: %Graph{
+          X: list(Detection.detection()),
+          XV: map(),
+          VX: map(),
+          nodes: list(atom()),
+          arcs: list(Arc.arc())
+        }
 
-  def detection_to_exit_arc(x_i, algorithm_state, v_i) do
-    p_exit = NFAlgorithmState.p_exit(algorithm_state)
-    exit_cost = Trajectory.c_ex_i(p_exit)
-    exit_flow = Trajectory.f_ex_i(algorithm_state[:T], x_i)
-    {v_i, :sink, exit_cost, exit_flow}
-  end
-
-  def detection_to_detection_arc(x_i, algorithm_state, nodes) do
-    exit_cost = Trajectory.c_i(algorithm_state[:constants][:beta])
-    exit_flow = Trajectory.f_i(algorithm_state[:T], x_i)
-    {elem(nodes, 0), elem(nodes, 1), exit_cost, exit_flow}
-  end
-
-  def detection_to_association_arcs(x_i, v_i, algorithm_state) do
-    plinked_detections =
-      get_plinked_detections(x_i, algorithm_state[:X], algorithm_state[:constants])
-
-    Enum.map(plinked_detections, fn d ->
-      destination_node = algorithm_state[:XV][d]
-      cost = Trajectory.c_i_j(Detection.p_link(x_i, d, algorithm_state[:constants]))
-      flow = Trajectory.f_i_j(algorithm_state[:T], x_i, d)
-      {v_i, destination_node, cost, flow}
-    end)
-  end
-
+  @spec detection_to_nodes(Detection.detection()) :: list(atom())
   def detection_to_nodes(x_i) do
-    u_i = String.to_atom("u_#{x_i["id"]}")
-    v_i = String.to_atom("v_#{x_i["id"]}")
-    {u_i, v_i}
+    u_i = String.to_atom("u_#{x_i.id}")
+    v_i = String.to_atom("v_#{x_i.id}")
+    [u_i, v_i]
   end
 
-  def detection_to_arcs(x_i, algorithm_state, nodes) do
-    u_i = elem(nodes, 0)
-    v_i = elem(nodes, 1)
+  def build_graph(trajectories, detections) do
+    # Build nodes and XV/VX mappings
+    detection_mapping_tuples =
+      Enum.map(detections, fn det ->
+        this_detection_nodes = detection_to_nodes(det)
+        {this_detection_nodes, det}
+      end)
 
-    entry_arc = detection_to_entry_arc(x_i, algorithm_state, u_i)
-    exit_arc = detection_to_exit_arc(x_i, algorithm_state, v_i)
-    detection_arc = detection_to_detection_arc(x_i, algorithm_state, nodes)
-    association_arcs = detection_to_association_arcs(x_i, v_i, algorithm_state)
+    nodes =
+      Enum.map(detection_mapping_tuples, fn dmt ->
+        elem(dmt, 0)
+      end)
 
-    [entry_arc, detection_arc, exit_arc] ++ association_arcs
-  end
+    xv =
+      Enum.reduce(detection_mapping_tuples, %{}, fn dmt, detection_node_mapping ->
+        nodes = elem(dmt, 0)
+        x = elem(dmt, 1)
+        Map.put(detection_node_mapping, x, nodes)
+      end)
 
-  def get_plinked_detections(x_i, detections, constants) do
-    Enum.filter(detections, fn d -> Detection.p_link(x_i, d, constants) > 0.0 end)
+    vx =
+      Enum.reduce(detection_mapping_tuples, %{}, fn dmt, detection_node_mapping ->
+        nodes = elem(dmt, 0)
+        node_u = List.first(nodes)
+        node_v = List.last(nodes)
+        x = elem(dmt, 1)
+        Map.merge(detection_node_mapping, %{node_u => x, node_v => x})
+      end)
+
+    arcs =
+      Enum.map(detections, fn det ->
+        Arc.detection_to_arcs(det, trajectories, detections, nodes, Configuration.constants())
+      end)
+
+    %Graph{X: detections, nodes: nodes, arcs: arcs, XV: xv, VX: vx}
   end
 end

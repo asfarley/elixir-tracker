@@ -1,11 +1,11 @@
 # Tracker
 
+An implementation of the global data-association algorithm described here:  
+[Global Data Association for Multi-Object Tracking Using Network Flows (Zhang, Li, Nevatia 2008)](http://vision.cse.psu.edu/courses/Tracking/vlpr12/lzhang_cvpr08global.pdf)
+
 ## TODO:
- * Write tests
- * Refactoring
- * Define structs: detections, arcs, algorithm_state, trajectory
- * Implement global cost calculation
- * Implement basic iterative algorithm (no occlusion model)
+ * Review code status, tests, and overall algorithm structure. What is missing for basic testing?
+ * Look up the 'scaling push-relabel method' described by A. V. Goldberg, An efficient implementation of a scaling minimum-cost algorithm
 
 ## Installation
 

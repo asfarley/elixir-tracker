@@ -8,90 +8,74 @@ defmodule DetectionTest do
 
   test "p_size_delta is inversely related to size-delta" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "Size" => 200}
-    x_j = %{Detection.new() | "Size" => 210}
-    x_k = %{Detection.new() | "Size" => 10_000}
+    x_i = %Detection{Size: 200}
+    x_j = %Detection{Size: 210}
+    x_k = %Detection{Size: 10_000}
     p_size_ij = Detection.p_size_delta(x_i, x_j, constants)
     p_size_jk = Detection.p_size_delta(x_j, x_k, constants)
-    IO.puts("p_size_ij: #{fmt(p_size_ij)}, p_size_jk: #{fmt(p_size_jk)}")
     assert p_size_jk < p_size_ij
   end
 
   test "p_position_delta is inversely related to position-delta" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "X" => 100}
-    x_j = %{Detection.new() | "X" => 110}
-    x_k = %{Detection.new() | "X" => 300}
+    x_i = %Detection{X: 100}
+    x_j = %Detection{X: 110}
+    x_k = %Detection{X: 300}
     p_position_ij = Detection.p_position_delta(x_i, x_j, constants)
     p_position_jk = Detection.p_position_delta(x_j, x_k, constants)
-    IO.puts("p_position_ij: #{fmt(p_position_ij)}, p_position_jk: #{fmt(p_position_jk)}")
     assert p_position_jk < p_position_ij
   end
 
   test "p_color_delta is inversely related to color-delta" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "Red" => 100}
-    x_j = %{Detection.new() | "Red" => 110}
-    x_k = %{Detection.new() | "Red" => 30}
+    x_i = %Detection{Red: 100}
+    x_j = %Detection{Red: 110}
+    x_k = %Detection{Red: 30}
     p_color_ij = Detection.p_color_delta(x_i, x_j, constants)
     p_color_jk = Detection.p_color_delta(x_j, x_k, constants)
-    IO.puts("p_color_ij: #{fmt(p_color_ij)}, p_color_jk: #{fmt(p_color_jk)}")
     assert p_color_jk < p_color_ij
   end
 
   test "p_time_delta is inversely related to time-delta when time-delta is greater
   than 0 and not greater than the maximum time-gap" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "frame" => 100}
-    x_j = %{Detection.new() | "frame" => 101}
-    x_k = %{Detection.new() | "frame" => 101 + constants[:epsilon]}
+    x_i = %Detection{frame: 100}
+    x_j = %Detection{frame: 101}
+    x_k = %Detection{frame: 101 + constants[:epsilon]}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
-    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_jk < p_time_ij
   end
 
   test "p_time_delta is zero when time-delta is equal to or less than 0" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "frame" => 100}
-    x_j = %{Detection.new() | "frame" => 100}
-    x_k = %{Detection.new() | "frame" => 50}
+    x_i = %Detection{frame: 100}
+    x_j = %Detection{frame: 100}
+    x_k = %Detection{frame: 50}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
-    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_ij == 0
     assert p_time_jk == 0
   end
 
   test "p_time_delta is zero when maximum time-delta is exceeded" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "frame" => 100}
-    x_j = %{Detection.new() | "frame" => 101}
-    x_k = %{Detection.new() | "frame" => 101 + constants[:epsilon] + 1}
+    x_i = %Detection{frame: 100}
+    x_j = %Detection{frame: 101}
+    x_k = %Detection{frame: 101 + constants[:epsilon] + 1}
     p_time_ij = Detection.p_time_delta(x_i, x_j, constants)
     p_time_jk = Detection.p_time_delta(x_j, x_k, constants)
-    IO.puts("p_time_ij: #{fmt(p_time_ij)}, p_time_jk: #{fmt(p_time_jk)}")
     assert p_time_ij != 0
     assert p_time_jk == 0
   end
 
   test "p_link decreases when measurements are dissimiliar" do
     constants = Configuration.constants()
-    x_i = %{Detection.new() | "X" => 100, "Y" => 200, "Size" => 100, "frame" => 100, "Red" => 100}
-    x_j = %{Detection.new() | "X" => 101, "Y" => 201, "Size" => 110, "frame" => 101, "Red" => 110}
-
-    x_k = %{
-      Detection.new()
-      | "X" => 110,
-        "Y" => 250,
-        "Size" => 1000,
-        "frame" => 1000,
-        "Red" => 200
-    }
-
+    x_i = %Detection{X: 100, Y: 200, Size: 100, frame: 100, Red: 100}
+    x_j = %Detection{X: 101, Y: 201, Size: 110, frame: 101, Red: 110}
+    x_k = %Detection{X: 110, Y: 250, Size: 1000, frame: 1000, Red: 200}
     p_link_ij = Detection.p_link(x_i, x_j, constants)
     p_link_jk = Detection.p_link(x_j, x_k, constants)
-    IO.puts("p_link_ij: #{fmt(p_link_ij)}, p_link_jk: #{fmt(p_link_jk)}")
     assert p_link_ij != 0
     assert p_link_jk < p_link_ij
   end
